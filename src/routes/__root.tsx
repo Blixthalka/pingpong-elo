@@ -10,7 +10,8 @@ import Header from '../components/Header'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
-import appCss from '../styles.css?url'
+// Import CSS directly so Vite can inline it during SSR
+import '../styles.css'
 
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -32,12 +33,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         title: 'Ping Pong ELO Tracker',
       },
     ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
   }),
 
   shellComponent: RootDocument,
@@ -48,6 +43,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        {/* Critical inline CSS to prevent FOUC */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              html, body {
+                margin: 0;
+                padding: 0;
+              }
+              html.dark {
+                background-color: rgba(15, 1, 7, 1);
+                color: rgba(255, 255, 255, 1);
+              }
+              body {
+                background-color: rgba(15, 1, 7, 1);
+                color: rgba(255, 255, 255, 1);
+              }
+            `,
+          }}
+        />
       </head>
       <body>
         <Header />
