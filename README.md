@@ -100,11 +100,122 @@ Matches are validated according to standard ping pong rules:
 
 # Building For Production
 
+## Option 1: Build Locally
+
 To build this application for production:
 
 ```bash
 pnpm build
 ```
+
+The built files will be in the `.output` directory.
+
+## Option 2: Docker Deployment
+
+### Build the Docker Image
+
+```bash
+docker build -t pingpong-elo .
+```
+
+### Run with Docker Compose (Recommended)
+
+1. **Create a production environment file:**
+
+```bash
+cp .env.prod.example .env.prod
+```
+
+Edit `.env.prod` and set a secure password for `POSTGRES_PASSWORD`.
+
+2. **Start the application:**
+
+```bash
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d
+```
+
+This will start both the PostgreSQL database and the application.
+
+3. **View logs:**
+
+```bash
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+4. **Stop the application:**
+
+```bash
+docker-compose -f docker-compose.prod.yml down
+```
+
+### Run Docker Image Manually
+
+If you prefer to run the Docker image without Docker Compose:
+
+```bash
+# Run PostgreSQL
+docker run -d \
+  --name pingpong-postgres \
+  -e POSTGRES_USER=pingpong \
+  -e POSTGRES_PASSWORD=your_secure_password \
+  -e POSTGRES_DB=pingpong_elo \
+  -v pingpong_data:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  postgres:16-alpine
+
+# Run the application
+docker run -d \
+  --name pingpong-app \
+  -e DATABASE_URL=postgres://pingpong:your_secure_password@host.docker.internal:5432/pingpong_elo \
+  -p 3000:3000 \
+  pingpong-elo
+```
+
+## Deployment to Cloud Platforms
+
+### Environment Variables Required
+
+For any deployment, make sure to set:
+
+- `DATABASE_URL`: PostgreSQL connection string
+- `NODE_ENV`: Set to `production`
+
+### Deploy to Fly.io
+
+```bash
+# Install flyctl
+curl -L https://fly.io/install.sh | sh
+
+# Login
+fly auth login
+
+# Launch app (follow prompts)
+fly launch
+
+# Create PostgreSQL database
+fly postgres create
+
+# Connect app to database
+fly postgres attach <postgres-app-name>
+
+# Deploy
+fly deploy
+```
+
+### Deploy to Railway
+
+1. Connect your GitHub repository to Railway
+2. Add a PostgreSQL database from Railway's marketplace
+3. Railway will automatically set `DATABASE_URL`
+4. Deploy!
+
+### Deploy to Render
+
+1. Create a new Web Service from your repository
+2. Add a PostgreSQL database
+3. Set the `DATABASE_URL` environment variable
+4. Build command: `pnpm install && pnpm build`
+5. Start command: `node .output/server/index.mjs`
 
 ## Testing
 

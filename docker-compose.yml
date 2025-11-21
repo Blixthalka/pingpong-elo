@@ -1,21 +1,43 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: pingpong-postgres
+    container_name: pingpong-postgres-prod
     environment:
       POSTGRES_USER: pingpong
       POSTGRES_PASSWORD: pingpong_dev_password
       POSTGRES_DB: pingpong_elo
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U pingpong"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - pingpong-network
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pingpong-app
+    environment:
+      DATABASE_URL: postgres://pingpong:pingpong_dev_password@postgres:5432/pingpong_elo
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pingpong-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
+
+networks:
+  pingpong-network:
+    driver: bridge
 
