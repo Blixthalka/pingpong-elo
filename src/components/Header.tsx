@@ -14,32 +14,32 @@ export default function Header() {
 
   return (
     <>
-      <header className="p-4 flex items-center bg-gray-800 text-white shadow-lg">
+      <header className="p-4 flex items-center bg-card text-foreground shadow-lg border-b border-border">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          className="p-2 hover:bg-table-row-hover rounded-lg transition-colors"
           aria-label="Open menu"
         >
           <Menu size={24} />
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/" className="flex items-center gap-2">
-            <Trophy className="text-yellow-400" size={28} />
-            <span>Pingis World Ranking</span>
+            <Trophy className="text-link" size={28} />
+            <span>Ping Pong ELO</span>
           </Link>
         </h1>
       </header>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`fixed top-0 left-0 h-full w-80 bg-sidebar text-sidebar-foreground shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
           <h2 className="text-xl font-bold">Navigering</h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
             aria-label="Stäng meny"
           >
             <X size={24} />
@@ -50,10 +50,10 @@ export default function Header() {
           <Link
             to="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors mb-2"
             activeProps={{
               className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                'flex items-center gap-3 p-3 rounded-lg bg-sidebar-primary hover:bg-[rgba(242,12,108,0.5)] transition-colors mb-2',
             }}
           >
             <Trophy size={20} />
@@ -63,10 +63,10 @@ export default function Header() {
           <Link
             to="/matches/new"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors mb-2"
             activeProps={{
               className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                'flex items-center gap-3 p-3 rounded-lg bg-sidebar-primary hover:bg-[rgba(242,12,108,0.5)] transition-colors mb-2',
             }}
           >
             <Swords size={20} />
@@ -76,10 +76,10 @@ export default function Header() {
           <Link
             to="/players/new"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            className="flex items-center gap-3 p-3 rounded-lg hover:bg-sidebar-accent transition-colors mb-2"
             activeProps={{
               className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                'flex items-center gap-3 p-3 rounded-lg bg-sidebar-primary hover:bg-[rgba(242,12,108,0.5)] transition-colors mb-2',
             }}
           >
             <UserPlus size={20} />

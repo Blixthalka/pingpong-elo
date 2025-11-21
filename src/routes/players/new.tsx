@@ -39,24 +39,24 @@ function AddPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="py-12 px-6 max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center text-cyan-400 hover:text-cyan-300 mb-6">
+        <Link to="/" className="inline-flex items-center text-link hover:text-[rgba(255,146,165,0.8)] mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Tillbaka till Översikt
         </Link>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-2xl text-white flex items-center gap-2">
-              <UserPlus className="w-6 h-6 text-cyan-400" />
+            <CardTitle className="text-2xl text-foreground flex items-center gap-2">
+              <UserPlus className="w-6 h-6 text-link" />
               Lägg till Ny Spelare
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-300">
+                <Label htmlFor="name" className="text-muted-foreground">
                   Spelarnamn
                 </Label>
                 <Input
@@ -65,17 +65,17 @@ function AddPlayer() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ange spelarnamn"
-                  className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-500"
+                  className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
                   disabled={isSubmitting}
                 />
-                {error && <p className="text-red-400 text-sm">{error}</p>}
+                {error && <p className="text-negative text-sm">{error}</p>}
               </div>
 
               <div className="flex gap-4">
                 <Button
                   type="submit"
                   disabled={isSubmitting || !name.trim()}
-                  className="bg-cyan-500 hover:bg-cyan-600 flex-1"
+                  className="bg-primary hover:bg-[rgba(242,12,108,0.5)] flex-1"
                 >
                   {isSubmitting ? 'Lägger till...' : 'Lägg till Spelare'}
                 </Button>
@@ -83,7 +83,7 @@ function AddPlayer() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
+                    className="border-border text-muted-foreground hover:bg-table-row-hover"
                   >
                     Avbryt
                   </Button>
@@ -91,9 +91,9 @@ function AddPlayer() {
               </div>
             </form>
 
-            <div className="mt-6 p-4 bg-slate-700/30 rounded-lg border border-slate-600">
-              <p className="text-sm text-gray-400">
-                <strong className="text-gray-300">OBS:</strong> Nya spelare börjar med en ELO-rating på 1500.
+            <div className="mt-6 p-4 bg-table-row rounded-lg border border-border">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">OBS:</strong> Nya spelare börjar med en ELO-rating på 1500.
               </p>
             </div>
           </CardContent>

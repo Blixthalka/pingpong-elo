@@ -80,17 +80,17 @@ function RegisterMatch() {
   const player2 = players.find((p) => p.id === parseInt(player2Id, 10))
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-background">
       <div className="py-12 px-6 max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center text-cyan-400 hover:text-cyan-300 mb-6">
+        <Link to="/" className="inline-flex items-center text-link hover:text-[rgba(255,146,165,0.8)] mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Tillbaka till Översikt
         </Link>
 
-        <Card className="bg-slate-800/50 border-slate-700">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-2xl text-white flex items-center gap-2">
-              <Swords className="w-6 h-6 text-cyan-400" />
+            <CardTitle className="text-2xl text-foreground flex items-center gap-2">
+              <Swords className="w-6 h-6 text-link" />
               Registrera Match
             </CardTitle>
           </CardHeader>
@@ -98,19 +98,19 @@ function RegisterMatch() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="player1" className="text-gray-300">
+                  <Label htmlFor="player1" className="text-muted-foreground">
                     Spelare 1
                   </Label>
                   <Select value={player1Id} onValueChange={setPlayer1Id} disabled={isSubmitting}>
-                    <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                    <SelectTrigger className="bg-input border-border text-foreground">
                       <SelectValue placeholder="Välj spelare 1" />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectContent className="bg-card border-border">
                       {players.map((player) => (
                         <SelectItem
                           key={player.id}
                           value={player.id.toString()}
-                          className="text-white hover:bg-slate-700"
+                          className="text-foreground hover:bg-table-row-hover"
                         >
                           {player.name} (ELO: {player.elo})
                         </SelectItem>
@@ -118,26 +118,26 @@ function RegisterMatch() {
                     </SelectContent>
                   </Select>
                   {player1 && (
-                    <p className="text-sm text-gray-400">
-                      Nuvarande ELO: <span className="text-cyan-400 font-semibold">{player1.elo}</span>
+                    <p className="text-sm text-muted-foreground">
+                      Nuvarande ELO: <span className="text-link font-semibold">{player1.elo}</span>
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="player2" className="text-gray-300">
+                  <Label htmlFor="player2" className="text-muted-foreground">
                     Spelare 2
                   </Label>
                   <Select value={player2Id} onValueChange={setPlayer2Id} disabled={isSubmitting}>
-                    <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                    <SelectTrigger className="bg-input border-border text-foreground">
                       <SelectValue placeholder="Välj spelare 2" />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectContent className="bg-card border-border">
                       {players.map((player) => (
                         <SelectItem
                           key={player.id}
                           value={player.id.toString()}
-                          className="text-white hover:bg-slate-700"
+                          className="text-foreground hover:bg-table-row-hover"
                         >
                           {player.name} (ELO: {player.elo})
                         </SelectItem>
@@ -145,8 +145,8 @@ function RegisterMatch() {
                     </SelectContent>
                   </Select>
                   {player2 && (
-                    <p className="text-sm text-gray-400">
-                      Nuvarande ELO: <span className="text-cyan-400 font-semibold">{player2.elo}</span>
+                    <p className="text-sm text-muted-foreground">
+                      Nuvarande ELO: <span className="text-link font-semibold">{player2.elo}</span>
                     </p>
                   )}
                 </div>
@@ -154,7 +154,7 @@ function RegisterMatch() {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="score1" className="text-gray-300">
+                  <Label htmlFor="score1" className="text-muted-foreground">
                     Spelare 1 Poäng
                   </Label>
                   <Input
@@ -164,13 +164,13 @@ function RegisterMatch() {
                     value={score1}
                     onChange={(e) => setScore1(e.target.value)}
                     placeholder="0"
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-500"
+                    className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
                     disabled={isSubmitting}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="score2" className="text-gray-300">
+                  <Label htmlFor="score2" className="text-muted-foreground">
                     Spelare 2 Poäng
                   </Label>
                   <Input
@@ -180,15 +180,15 @@ function RegisterMatch() {
                     value={score2}
                     onChange={(e) => setScore2(e.target.value)}
                     placeholder="0"
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-500"
+                    className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
                     disabled={isSubmitting}
                   />
                 </div>
               </div>
 
               {error && (
-                <div className="p-4 bg-red-500/10 border border-red-500/50 rounded-lg">
-                  <p className="text-red-400 text-sm">{error}</p>
+                <div className="p-4 bg-[rgba(255,71,103,0.1)] border border-[rgba(255,71,103,0.5)] rounded-lg">
+                  <p className="text-negative text-sm">{error}</p>
                 </div>
               )}
 
@@ -196,7 +196,7 @@ function RegisterMatch() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || !player1Id || !player2Id || !score1 || !score2}
-                  className="bg-cyan-500 hover:bg-cyan-600 flex-1"
+                  className="bg-primary hover:bg-[rgba(242,12,108,0.5)] flex-1"
                 >
                   {isSubmitting ? 'Registrerar...' : 'Registrera Match'}
                 </Button>
@@ -204,7 +204,7 @@ function RegisterMatch() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-slate-600 text-gray-300 hover:bg-slate-700/50"
+                    className="border-border text-muted-foreground hover:bg-table-row-hover"
                   >
                     Avbryt
                   </Button>
@@ -212,11 +212,11 @@ function RegisterMatch() {
               </div>
             </form>
 
-            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/50 rounded-lg">
+            <div className="mt-6 p-4 bg-[rgba(68,188,255,0.1)] border border-[rgba(68,188,255,0.5)] rounded-lg">
               <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-300">
-                  <strong className="text-blue-400">Pingisregler:</strong>
+                <Info className="w-5 h-5 text-[rgba(68,188,255,1)] flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-muted-foreground">
+                  <strong className="text-[rgba(68,188,255,1)]">Pingisregler:</strong>
                   <ul className="mt-2 space-y-1 list-disc list-inside">
                     <li>Välj din motståndare</li>
                     <li>Bäst av 1 eller 3 set</li>
