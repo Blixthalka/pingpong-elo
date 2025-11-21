@@ -1,13 +1,55 @@
-Welcome to your new TanStack app! 
+# Ping Pong ELO Tracker
 
-# Getting Started
+A full-stack office ping pong tournament tracker with ELO rankings built with TanStack Start, React, and SQLite.
+
+## Features
+
+- **ELO Rating System**: Standard ELO calculation with K-factor of 32
+- **Match Registration**: Enforce standard ping pong rules (11 points, win by 2)
+- **Leaderboard Dashboard**: Real-time rankings with win/loss statistics
+- **Player Management**: Add new contestants to the tournament
+- **Match History**: View recent matches with ELO changes
+- **SQLite Database**: Persistent local storage with sql.js (WebAssembly SQLite)
+
+## Getting Started
 
 To run this application:
 
 ```bash
 pnpm install
-pnpm start
+pnpm dev
 ```
+
+The application will be available at `http://localhost:3000`
+
+## Application Structure
+
+### Core Components
+
+- **Dashboard** (`/`): Displays leaderboard and recent matches
+- **Register Match** (`/matches/new`): Form to record match results
+- **Add Player** (`/players/new`): Form to add new contestants
+
+### Technical Implementation
+
+- **Database** (`src/lib/db.ts`): SQLite schema and initialization
+- **ELO Logic** (`src/lib/elo.ts`): Standard ELO calculation algorithm
+- **Game Rules** (`src/lib/rules.ts`): Ping pong rule validation
+- **Server Functions** (`src/routes/api.pingpong.ts`): Type-safe server endpoints
+
+### Ping Pong Rules
+
+Matches are validated according to standard ping pong rules:
+- Winner must score at least 11 points
+- Winner must win by at least 2 points
+- No ties allowed
+
+### ELO System
+
+- New players start at 1500 ELO
+- K-factor of 32 (standard for competitive games)
+- Ratings update automatically after each match
+- Win/loss records tracked alongside ELO
 
 # Building For Production
 
@@ -300,10 +342,6 @@ We use the `Derived` class to create a new store that is derived from another st
 Once we've created the derived store we can use it in the `App` component just like we would any other store using the `useStore` hook.
 
 You can find out everything you need to know on how to use TanStack Store in the [TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
 
 # Learn More
 
