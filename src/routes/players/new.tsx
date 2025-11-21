@@ -93,7 +93,7 @@ function AddPlayer() {
 
             <div className="mt-6 p-4 bg-table-row rounded-lg border border-border">
               <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">OBS:</strong> Nya spelare börjar med en ELO-rating på 1500.
+                <strong className="text-foreground">OBS:</strong> Nya spelare börjar med en ELO-rating på 1000.
               </p>
             </div>
           </CardContent>

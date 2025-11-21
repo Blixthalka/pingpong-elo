@@ -93,7 +93,7 @@ Matches are validated according to standard ping pong rules:
 
 ### ELO System
 
-- New players start at 1500 ELO
+- New players start at 1000 ELO
 - K-factor of 32 (standard for competitive games)
 - Ratings update automatically after each match
 - Win/loss records tracked alongside ELO

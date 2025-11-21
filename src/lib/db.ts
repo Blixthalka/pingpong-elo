@@ -24,7 +24,7 @@ async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS players (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL UNIQUE,
-        elo INTEGER NOT NULL DEFAULT 1500,
+        elo INTEGER NOT NULL DEFAULT 1000,
         wins INTEGER NOT NULL DEFAULT 0,
         losses INTEGER NOT NULL DEFAULT 0,
         created_at BIGINT NOT NULL
@@ -120,7 +120,7 @@ export const db = {
     const now = Date.now()
     const players = await sql<Player[]>`
       INSERT INTO players (name, elo, wins, losses, created_at)
-      VALUES (${name}, 1500, 0, 0, ${now})
+      VALUES (${name}, 1000, 0, 0, ${now})
       RETURNING *
     `
     
