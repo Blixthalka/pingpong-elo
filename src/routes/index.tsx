@@ -28,31 +28,30 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative py-12 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(229,34,116,0.05)] via-[rgba(255,146,165,0.05)] to-[rgba(190,25,91,0.05)]"></div>
+      <section className="relative py-10 px-6 text-center overflow-hidden hero-gradient">
         <div className="relative max-w-7xl mx-auto">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <Trophy className="w-16 h-16 text-[rgba(255,146,165,1)]" />
-            <h1 className="text-5xl md:text-6xl font-black text-foreground">
-              <span className="bg-gradient-to-r from-[rgba(255,146,165,1)] to-[rgba(229,34,116,1)] bg-clip-text text-transparent">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Trophy className="w-12 h-12 text-link" />
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+              <span className="bg-gradient-to-r from-link to-[rgba(229,34,116,1)] bg-clip-text text-transparent">
                 Ping Pong
               </span>{' '}
-              <span className="text-muted-foreground">ELO</span>
+              <span className="text-muted-foreground font-semibold">ELO</span>
             </h1>
           </div>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-base text-muted-foreground mb-6 tracking-wide">
             Topplista för Pingis World Ranking
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-3">
             <Link to="/matches/new">
-              <Button size="lg" className="bg-primary hover:bg-[rgba(242,12,108,0.5)]">
-                <Swords className="w-5 h-5 mr-2" />
+              <Button size="lg">
+                <Swords className="w-4 h-4" />
                 Registrera Match
               </Button>
             </Link>
             <Link to="/players/new">
-              <Button size="lg" variant="outline" className="border-[rgba(255,146,165,0.3)] text-link hover:bg-secondary">
-                <Plus className="w-5 h-5 mr-2" />
+              <Button size="lg" variant="outline" className="text-link">
+                <Plus className="w-4 h-4" />
                 Lägg till Spelare
               </Button>
             </Link>
@@ -60,25 +59,25 @@ function Dashboard() {
         </div>
       </section>
 
-      <section className="py-8 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 bg-card border-border">
+      <section className="py-6 px-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle className="text-2xl text-foreground flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-link" />
+              <CardTitle className="text-lg text-foreground flex items-center gap-2 font-bold tracking-tight">
+                <Trophy className="w-5 h-5 text-link" />
                 Topplista
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
-                  <TableRow className="border-border hover:bg-table-row-hover">
-                    <TableHead className="text-muted-foreground w-16">Rank</TableHead>
-                    <TableHead className="text-muted-foreground">Spelare</TableHead>
-                    <TableHead className="text-muted-foreground text-right">ELO</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Vinster</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Förluster</TableHead>
-                    <TableHead className="text-muted-foreground text-right">Vinstprocent</TableHead>
+                  <TableRow className="border-border/50 hover:bg-transparent">
+                    <TableHead className="w-16">Rank</TableHead>
+                    <TableHead>Spelare</TableHead>
+                    <TableHead className="text-right">ELO</TableHead>
+                    <TableHead className="text-right">Vinster</TableHead>
+                    <TableHead className="text-right">Förluster</TableHead>
+                    <TableHead className="text-right">Win%</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -86,22 +85,22 @@ function Dashboard() {
                     const totalGames = player.wins + player.losses
                     const winRate = totalGames > 0 ? ((player.wins / totalGames) * 100).toFixed(1) : '0.0'
                     return (
-                      <TableRow key={player.id} className="border-border hover:bg-table-row-hover">
-                        <TableCell className="font-medium text-foreground">
+                      <TableRow key={player.id} className="border-border/30 hover:bg-table-row-hover transition-colors">
+                        <TableCell className="font-semibold text-foreground">
                           {index === 0 && '🥇'}
                           {index === 1 && '🥈'}
                           {index === 2 && '🥉'}
-                          {index > 2 && `#${index + 1}`}
+                          {index > 2 && <span className="text-muted-foreground">#{index + 1}</span>}
                         </TableCell>
                         <TableCell className="font-semibold">
-                          <Link to={`/players/${player.id}`} className="text-link hover:text-[rgba(255,146,165,0.8)]">
+                          <Link to={`/players/${player.id}`} className="text-link hover:text-link/70 transition-colors">
                             {player.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-right text-link font-bold">{player.elo}</TableCell>
-                        <TableCell className="text-right text-positive">{player.wins}</TableCell>
-                        <TableCell className="text-right text-negative">{player.losses}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">{winRate}%</TableCell>
+                        <TableCell className="text-right text-link font-bold tabular-nums">{player.elo}</TableCell>
+                        <TableCell className="text-right text-positive font-medium tabular-nums">{player.wins}</TableCell>
+                        <TableCell className="text-right text-negative font-medium tabular-nums">{player.losses}</TableCell>
+                        <TableCell className="text-right text-muted-foreground tabular-nums">{winRate}%</TableCell>
                       </TableRow>
                     )
                   })}
@@ -110,14 +109,14 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-xl text-foreground">Senaste Matcher</CardTitle>
+              <CardTitle className="text-lg text-foreground font-bold tracking-tight">Senaste Matcher</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recentMatches.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">Inga matcher än</p>
+                  <p className="text-muted-foreground text-center py-8 text-sm">Inga matcher än</p>
                 ) : (
                   recentMatches.map((match) => {
                     const winner = match.score1 > match.score2 ? match.player1_name : match.player2_name
@@ -130,29 +129,29 @@ function Dashboard() {
                     return (
                       <div
                         key={match.id}
-                        className="bg-table-row rounded-lg p-4 border border-border hover:bg-table-row-hover transition-colors"
+                        className="bg-table-row rounded p-3 border border-border/50 hover:bg-table-row-hover hover:border-border transition-all duration-150"
                       >
-                        <div className="flex justify-between items-center mb-2">
-                          <span className={`font-semibold ${isPlayer1Winner ? 'text-positive' : 'text-muted-foreground'}`}>
+                        <div className="flex justify-between items-center mb-1.5">
+                          <span className={`text-sm font-semibold ${isPlayer1Winner ? 'text-positive' : 'text-muted-foreground'}`}>
                             {match.player1_name}
                           </span>
-                          <span className="text-2xl font-bold text-foreground">
+                          <span className="text-xl font-bold text-foreground tabular-nums">
                             {match.score1} - {match.score2}
                           </span>
-                          <span className={`font-semibold ${!isPlayer1Winner ? 'text-positive' : 'text-muted-foreground'}`}>
+                          <span className={`text-sm font-semibold ${!isPlayer1Winner ? 'text-positive' : 'text-muted-foreground'}`}>
                             {match.player2_name}
                           </span>
                         </div>
                         {setScores && setScores.length > 0 && (
-                          <div className="text-xs text-muted-foreground text-center mb-1">
+                          <div className="text-xs text-muted-foreground text-center mb-1 tabular-nums">
                             ({setScores.map((s) => `${s.score1}-${s.score2}`).join(', ')})
                           </div>
                         )}
                         <div className="text-xs text-muted-foreground text-center">
-                          <span className="bg-[rgba(255,146,165,0.2)] px-2 py-0.5 rounded mr-2">{formatLabel}</span>
-                          Vinnare: {winner}
+                          <span className="bg-link/15 text-link/90 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider mr-2">{formatLabel}</span>
+                          <span className="text-muted-foreground/80">Vinnare: {winner}</span>
                         </div>
-                        <div className="flex justify-between text-xs text-muted mt-2">
+                        <div className="flex justify-between text-xs mt-2 font-medium tabular-nums">
                           <span className={match.player1_elo_after > match.player1_elo_before ? 'text-positive' : 'text-negative'}>
                             {match.player1_elo_after > match.player1_elo_before ? '+' : ''}
                             {match.player1_elo_after - match.player1_elo_before} ELO

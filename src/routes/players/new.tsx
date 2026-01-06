@@ -40,23 +40,23 @@ function AddPlayer() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="py-12 px-6 max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center text-link hover:text-[rgba(255,146,165,0.8)] mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className="py-8 px-6 max-w-2xl mx-auto">
+        <Link to="/" className="inline-flex items-center text-link hover:text-link/70 transition-colors mb-5 text-sm font-medium">
+          <ArrowLeft className="w-4 h-4 mr-1.5" />
           Tillbaka till Översikt
         </Link>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-foreground flex items-center gap-2">
-              <UserPlus className="w-6 h-6 text-link" />
+            <CardTitle className="text-xl text-foreground flex items-center gap-2 font-bold tracking-tight">
+              <UserPlus className="w-5 h-5 text-link" />
               Lägg till Ny Spelare
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-muted-foreground">
+                <Label htmlFor="name" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
                   Spelarnamn
                 </Label>
                 <Input
@@ -65,34 +65,29 @@ function AddPlayer() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ange spelarnamn"
-                  className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
                   disabled={isSubmitting}
                 />
                 {error && <p className="text-negative text-sm">{error}</p>}
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex gap-3 pt-2">
                 <Button
                   type="submit"
                   disabled={isSubmitting || !name.trim()}
-                  className="bg-primary hover:bg-[rgba(242,12,108,0.5)] flex-1"
+                  className="flex-1"
                 >
                   {isSubmitting ? 'Lägger till...' : 'Lägg till Spelare'}
                 </Button>
                 <Link to="/">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-border text-muted-foreground hover:bg-table-row-hover"
-                  >
+                  <Button type="button" variant="outline">
                     Avbryt
                   </Button>
                 </Link>
               </div>
             </form>
 
-            <div className="mt-6 p-4 bg-table-row rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground">
+            <div className="mt-5 p-3 bg-table-row rounded border border-border/50">
+              <p className="text-xs text-muted-foreground">
                 <strong className="text-foreground">OBS:</strong> Nya spelare börjar med en ELO-rating på 1000.
               </p>
             </div>

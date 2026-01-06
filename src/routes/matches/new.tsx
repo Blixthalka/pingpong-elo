@@ -141,29 +141,29 @@ function RegisterMatch() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="py-12 px-6 max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center text-link hover:text-[rgba(255,146,165,0.8)] mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className="py-8 px-6 max-w-2xl mx-auto">
+        <Link to="/" className="inline-flex items-center text-link hover:text-link/70 transition-colors mb-5 text-sm font-medium">
+          <ArrowLeft className="w-4 h-4 mr-1.5" />
           Tillbaka till Översikt
         </Link>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl text-foreground flex items-center gap-2">
-              <Swords className="w-6 h-6 text-link" />
+            <CardTitle className="text-xl text-foreground flex items-center gap-2 font-bold tracking-tight">
+              <Swords className="w-5 h-5 text-link" />
               Registrera Match
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Player Selection */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <Label htmlFor="player1" className="text-muted-foreground">
+                  <Label htmlFor="player1" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
                     Spelare 1
                   </Label>
                   <Select value={player1Id} onValueChange={setPlayer1Id} disabled={isSubmitting}>
-                    <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectTrigger className="bg-input/40 border-[rgba(255,128,191,0.1)] text-foreground">
                       <SelectValue placeholder="Välj spelare 1" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
@@ -179,18 +179,18 @@ function RegisterMatch() {
                     </SelectContent>
                   </Select>
                   {player1 && (
-                    <p className="text-sm text-muted-foreground">
-                      Nuvarande ELO: <span className="text-link font-semibold">{player1.elo}</span>
+                    <p className="text-xs text-muted-foreground">
+                      Nuvarande ELO: <span className="text-link font-semibold tabular-nums">{player1.elo}</span>
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="player2" className="text-muted-foreground">
+                  <Label htmlFor="player2" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">
                     Spelare 2
                   </Label>
                   <Select value={player2Id} onValueChange={setPlayer2Id} disabled={isSubmitting}>
-                    <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectTrigger className="bg-input/40 border-[rgba(255,128,191,0.1)] text-foreground">
                       <SelectValue placeholder="Välj spelare 2" />
                     </SelectTrigger>
                     <SelectContent className="bg-card border-border">
@@ -206,8 +206,8 @@ function RegisterMatch() {
                     </SelectContent>
                   </Select>
                   {player2 && (
-                    <p className="text-sm text-muted-foreground">
-                      Nuvarande ELO: <span className="text-link font-semibold">{player2.elo}</span>
+                    <p className="text-xs text-muted-foreground">
+                      Nuvarande ELO: <span className="text-link font-semibold tabular-nums">{player2.elo}</span>
                     </p>
                   )}
                 </div>
@@ -215,9 +215,9 @@ function RegisterMatch() {
 
               {/* Match Format Selection */}
               <div className="space-y-2">
-                <Label className="text-muted-foreground">Matchformat</Label>
+                <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Matchformat</Label>
                 <Select value={matchFormat} onValueChange={handleMatchFormatChange} disabled={isSubmitting}>
-                  <SelectTrigger className="bg-input border-border text-foreground">
+                  <SelectTrigger className="bg-input/40 border-[rgba(255,128,191,0.1)] text-foreground">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border">
@@ -239,8 +239,8 @@ function RegisterMatch() {
 
               {/* Sets Won Display */}
               {(setsWon1 > 0 || setsWon2 > 0) && (
-                <div className="p-4 bg-[rgba(255,146,165,0.1)] border border-[rgba(255,146,165,0.3)] rounded-lg">
-                  <div className="flex justify-between items-center">
+                <div className="p-3 bg-link/10 border border-link/20 rounded">
+                  <div className="flex justify-between items-center text-sm">
                     <span className={`font-semibold ${setsWon1 >= setsToWin ? 'text-positive' : 'text-foreground'}`}>
                       {player1?.name || 'Spelare 1'}: {setsWon1} set
                     </span>
@@ -250,7 +250,7 @@ function RegisterMatch() {
                     </span>
                   </div>
                   {matchComplete && (
-                    <p className="text-center text-positive mt-2 font-semibold">
+                    <p className="text-center text-positive mt-2 font-semibold text-sm">
                       {setsWon1 >= setsToWin ? player1?.name : player2?.name} vinner matchen!
                     </p>
                   )}
@@ -258,28 +258,28 @@ function RegisterMatch() {
               )}
 
               {/* Set Scores */}
-              <div className="space-y-4">
-                <Label className="text-muted-foreground">Setresultat</Label>
+              <div className="space-y-3">
+                <Label className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">Setresultat</Label>
                 {setScores.map((set, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <span className="text-muted-foreground text-sm w-16">Set {index + 1}</span>
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-muted-foreground text-xs font-medium w-14">Set {index + 1}</span>
                     <Input
                       type="number"
                       min="0"
                       value={set.score1}
                       onChange={(e) => handleSetScoreChange(index, 'score1', e.target.value)}
                       placeholder="0"
-                      className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)] w-20 text-center"
+                      className="w-16 text-center tabular-nums"
                       disabled={isSubmitting}
                     />
-                    <span className="text-muted-foreground">-</span>
+                    <span className="text-muted-foreground text-sm">-</span>
                     <Input
                       type="number"
                       min="0"
                       value={set.score2}
                       onChange={(e) => handleSetScoreChange(index, 'score2', e.target.value)}
                       placeholder="0"
-                      className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)] w-20 text-center"
+                      className="w-16 text-center tabular-nums"
                       disabled={isSubmitting}
                     />
                     {setScores.length > 1 && (
@@ -289,7 +289,7 @@ function RegisterMatch() {
                         size="sm"
                         onClick={() => removeSet(index)}
                         disabled={isSubmitting}
-                        className="text-negative hover:text-negative hover:bg-[rgba(255,71,103,0.1)]"
+                        className="text-negative hover:text-negative hover:bg-negative/10"
                       >
                         <Minus className="w-4 h-4" />
                       </Button>
@@ -304,46 +304,41 @@ function RegisterMatch() {
                     size="sm"
                     onClick={addSet}
                     disabled={isSubmitting}
-                    className="border-border text-muted-foreground hover:bg-table-row-hover"
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Lägg till set
                   </Button>
                 )}
               </div>
 
               {error && (
-                <div className="p-4 bg-[rgba(255,71,103,0.1)] border border-[rgba(255,71,103,0.5)] rounded-lg">
+                <div className="p-3 bg-negative/10 border border-negative/30 rounded">
                   <p className="text-negative text-sm">{error}</p>
                 </div>
               )}
 
-              <div className="flex gap-4">
+              <div className="flex gap-3 pt-2">
                 <Button
                   type="submit"
                   disabled={isSubmitting || !player1Id || !player2Id || !matchComplete}
-                  className="bg-primary hover:bg-[rgba(242,12,108,0.5)] flex-1"
+                  className="flex-1"
                 >
                   {isSubmitting ? 'Registrerar...' : 'Registrera Match'}
                 </Button>
                 <Link to="/">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-border text-muted-foreground hover:bg-table-row-hover"
-                  >
+                  <Button type="button" variant="outline">
                     Avbryt
                   </Button>
                 </Link>
               </div>
             </form>
 
-            <div className="mt-6 p-4 bg-[rgba(68,188,255,0.1)] border border-[rgba(68,188,255,0.5)] rounded-lg">
+            <div className="mt-5 p-3 bg-[rgba(68,188,255,0.08)] border border-[rgba(68,188,255,0.2)] rounded">
               <div className="flex items-start gap-2">
-                <Info className="w-5 h-5 text-[rgba(68,188,255,1)] flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-muted-foreground">
+                <Info className="w-4 h-4 text-[rgba(68,188,255,1)] flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-muted-foreground">
                   <strong className="text-[rgba(68,188,255,1)]">Pingisregler:</strong>
-                  <ul className="mt-2 space-y-1 list-disc list-inside">
+                  <ul className="mt-1.5 space-y-0.5 list-disc list-inside">
                     <li>Välj matchformat: bäst av 1, 3 eller 5 set</li>
                     <li>Vinnaren av varje set måste ha minst 11 poäng</li>
                     <li>Vinnaren av varje set måste vinna med minst 2 poäng</li>

@@ -23,52 +23,52 @@ function PlayerDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="py-12 px-6 max-w-4xl mx-auto">
-        <Link to="/" className="inline-flex items-center text-link hover:text-[rgba(255,146,165,0.8)] mb-6">
-          <ArrowLeft className="w-4 h-4 mr-2" />
+      <div className="py-8 px-6 max-w-4xl mx-auto">
+        <Link to="/" className="inline-flex items-center text-link hover:text-link/70 transition-colors mb-5 text-sm font-medium">
+          <ArrowLeft className="w-4 h-4 mr-1.5" />
           Tillbaka till Översikt
         </Link>
 
-        <Card className="bg-card border-border mb-6">
+        <Card className="mb-5">
           <CardHeader>
-            <CardTitle className="text-2xl text-foreground flex items-center gap-2">
-              <User className="w-6 h-6 text-link" />
+            <CardTitle className="text-xl text-foreground flex items-center gap-2 font-bold tracking-tight">
+              <User className="w-5 h-5 text-link" />
               {player.name}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-table-row rounded-lg p-4 border border-border text-center">
-                <div className="text-3xl font-bold text-link">{player.elo}</div>
-                <div className="text-sm text-muted-foreground">ELO</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-table-row rounded p-4 border border-border/50 text-center">
+                <div className="text-2xl font-bold text-link tabular-nums">{player.elo}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-1">ELO</div>
               </div>
-              <div className="bg-table-row rounded-lg p-4 border border-border text-center">
-                <div className="text-3xl font-bold text-positive">{player.wins}</div>
-                <div className="text-sm text-muted-foreground">Vinster</div>
+              <div className="bg-table-row rounded p-4 border border-border/50 text-center">
+                <div className="text-2xl font-bold text-positive tabular-nums">{player.wins}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-1">Vinster</div>
               </div>
-              <div className="bg-table-row rounded-lg p-4 border border-border text-center">
-                <div className="text-3xl font-bold text-negative">{player.losses}</div>
-                <div className="text-sm text-muted-foreground">Förluster</div>
+              <div className="bg-table-row rounded p-4 border border-border/50 text-center">
+                <div className="text-2xl font-bold text-negative tabular-nums">{player.losses}</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-1">Förluster</div>
               </div>
-              <div className="bg-table-row rounded-lg p-4 border border-border text-center">
-                <div className="text-3xl font-bold text-foreground">{winRate}%</div>
-                <div className="text-sm text-muted-foreground">Vinstprocent</div>
+              <div className="bg-table-row rounded p-4 border border-border/50 text-center">
+                <div className="text-2xl font-bold text-foreground tabular-nums">{winRate}%</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-1">Win%</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl text-foreground flex items-center gap-2">
+            <CardTitle className="text-lg text-foreground flex items-center gap-2 font-bold tracking-tight">
               <Trophy className="w-5 h-5 text-link" />
               Matchhistorik
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {matches.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">Inga matcher än</p>
+                <p className="text-muted-foreground text-center py-8 text-sm">Inga matcher än</p>
               ) : (
                 matches.map((match) => {
                   const isPlayer1 = match.player1_id === player.id
@@ -88,31 +88,31 @@ function PlayerDetail() {
                   return (
                     <div
                       key={match.id}
-                      className="bg-table-row rounded-lg p-4 border border-border hover:bg-table-row-hover transition-colors"
+                      className="bg-table-row rounded p-3 border border-border/50 hover:bg-table-row-hover hover:border-border transition-all duration-150"
                     >
                       <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2.5">
                           {won ? (
-                            <TrendingUp className="w-5 h-5 text-positive" />
+                            <TrendingUp className="w-4 h-4 text-positive" />
                           ) : (
-                            <TrendingDown className="w-5 h-5 text-negative" />
+                            <TrendingDown className="w-4 h-4 text-negative" />
                           )}
                           <div>
-                            <div className="text-foreground font-semibold">
+                            <div className="text-foreground font-semibold text-sm">
                               vs {opponentName}
                             </div>
-                            <div className="text-sm text-muted-foreground flex items-center gap-2">
-                              <span className="bg-[rgba(255,146,165,0.2)] px-1.5 py-0.5 rounded text-xs">{formatLabel}</span>
-                              {won ? 'Vinst' : 'Förlust'}
+                            <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                              <span className="bg-link/15 text-link/90 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider">{formatLabel}</span>
+                              <span>{won ? 'Vinst' : 'Förlust'}</span>
                             </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-foreground">
+                          <div className="text-xl font-bold text-foreground tabular-nums">
                             {playerScore} - {opponentScore}
                           </div>
                           {setScores && setScores.length > 0 && (
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground tabular-nums">
                               ({setScores
                                 .map((s) =>
                                   isPlayer1
@@ -122,7 +122,7 @@ function PlayerDetail() {
                                 .join(', ')})
                             </div>
                           )}
-                          <div className={`text-sm font-medium ${eloChange > 0 ? 'text-positive' : 'text-negative'}`}>
+                          <div className={`text-sm font-semibold tabular-nums ${eloChange > 0 ? 'text-positive' : 'text-negative'}`}>
                             {eloChange > 0 ? '+' : ''}{eloChange} ELO
                           </div>
                         </div>
