@@ -1,6 +1,6 @@
 import { createFileRoute, useRouter, Link } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Swords, ArrowLeft, Info } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Swords, ArrowLeft, Info, Plus, Minus } from 'lucide-react'
 import { getPlayers, registerMatch } from '../api.pingpong'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
@@ -22,16 +22,69 @@ export const Route = createFileRoute('/matches/new')({
   },
 })
 
+type SetScore = {
+  score1: string
+  score2: string
+}
+
 function RegisterMatch() {
   const router = useRouter()
   const { players } = Route.useLoaderData()
 
   const [player1Id, setPlayer1Id] = useState<string>('')
   const [player2Id, setPlayer2Id] = useState<string>('')
-  const [score1, setScore1] = useState('')
-  const [score2, setScore2] = useState('')
+  const [matchFormat, setMatchFormat] = useState<string>('1')
+  const [setScores, setSetScores] = useState<SetScore[]>([{ score1: '', score2: '' }])
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const maxSets = parseInt(matchFormat, 10)
+  const setsToWin = Math.ceil(maxSets / 2)
+
+  // Calculate current sets won
+  const { setsWon1, setsWon2, matchComplete } = useMemo(() => {
+    let won1 = 0
+    let won2 = 0
+
+    for (const set of setScores) {
+      const s1 = parseInt(set.score1, 10)
+      const s2 = parseInt(set.score2, 10)
+      if (!isNaN(s1) && !isNaN(s2) && s1 !== s2) {
+        if (s1 > s2) won1++
+        else won2++
+      }
+    }
+
+    return {
+      setsWon1: won1,
+      setsWon2: won2,
+      matchComplete: won1 >= setsToWin || won2 >= setsToWin,
+    }
+  }, [setScores, setsToWin])
+
+  const handleMatchFormatChange = (value: string) => {
+    setMatchFormat(value)
+    // Reset set scores when format changes
+    setSetScores([{ score1: '', score2: '' }])
+  }
+
+  const handleSetScoreChange = (index: number, field: 'score1' | 'score2', value: string) => {
+    const newScores = [...setScores]
+    newScores[index] = { ...newScores[index], [field]: value }
+    setSetScores(newScores)
+  }
+
+  const addSet = () => {
+    if (setScores.length < maxSets && !matchComplete) {
+      setSetScores([...setScores, { score1: '', score2: '' }])
+    }
+  }
+
+  const removeSet = (index: number) => {
+    if (setScores.length > 1) {
+      setSetScores(setScores.filter((_, i) => i !== index))
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,12 +100,18 @@ function RegisterMatch() {
       return
     }
 
-    const s1 = parseInt(score1, 10)
-    const s2 = parseInt(score2, 10)
+    // Convert set scores to numbers
+    const parsedSetScores = setScores.map((set) => ({
+      score1: parseInt(set.score1, 10),
+      score2: parseInt(set.score2, 10),
+    }))
 
-    if (isNaN(s1) || isNaN(s2)) {
-      setError('Vänligen ange giltiga poäng')
-      return
+    // Validate all sets have scores
+    for (let i = 0; i < parsedSetScores.length; i++) {
+      if (isNaN(parsedSetScores[i].score1) || isNaN(parsedSetScores[i].score2)) {
+        setError(`Set ${i + 1}: Vänligen ange giltiga poäng`)
+        return
+      }
     }
 
     setIsSubmitting(true)
@@ -62,12 +121,11 @@ function RegisterMatch() {
         data: {
           player1_id: parseInt(player1Id, 10),
           player2_id: parseInt(player2Id, 10),
-          score1: s1,
-          score2: s2,
+          match_format: parseInt(matchFormat, 10),
+          set_scores: parsedSetScores,
         },
       })
 
-      // Show success message with ELO changes
       router.navigate({ to: '/' })
     } catch (err: any) {
       setError(err.message || 'Kunde inte registrera match')
@@ -78,6 +136,8 @@ function RegisterMatch() {
 
   const player1 = players.find((p) => p.id === parseInt(player1Id, 10))
   const player2 = players.find((p) => p.id === parseInt(player2Id, 10))
+
+  const canAddSet = setScores.length < maxSets && !matchComplete
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,6 +156,7 @@ function RegisterMatch() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Player Selection */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="player1" className="text-muted-foreground">
@@ -152,38 +213,103 @@ function RegisterMatch() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="score1" className="text-muted-foreground">
-                    Spelare 1 Poäng
-                  </Label>
-                  <Input
-                    id="score1"
-                    type="number"
-                    min="0"
-                    value={score1}
-                    onChange={(e) => setScore1(e.target.value)}
-                    placeholder="0"
-                    className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
-                    disabled={isSubmitting}
-                  />
-                </div>
+              {/* Match Format Selection */}
+              <div className="space-y-2">
+                <Label className="text-muted-foreground">Matchformat</Label>
+                <Select value={matchFormat} onValueChange={handleMatchFormatChange} disabled={isSubmitting}>
+                  <SelectTrigger className="bg-input border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    <SelectItem value="1" className="text-foreground hover:bg-table-row-hover">
+                      Bäst av 1 set
+                    </SelectItem>
+                    <SelectItem value="3" className="text-foreground hover:bg-table-row-hover">
+                      Bäst av 3 set
+                    </SelectItem>
+                    <SelectItem value="5" className="text-foreground hover:bg-table-row-hover">
+                      Bäst av 5 set
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Första till {setsToWin} vunna set vinner matchen
+                </p>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="score2" className="text-muted-foreground">
-                    Spelare 2 Poäng
-                  </Label>
-                  <Input
-                    id="score2"
-                    type="number"
-                    min="0"
-                    value={score2}
-                    onChange={(e) => setScore2(e.target.value)}
-                    placeholder="0"
-                    className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)]"
-                    disabled={isSubmitting}
-                  />
+              {/* Sets Won Display */}
+              {(setsWon1 > 0 || setsWon2 > 0) && (
+                <div className="p-4 bg-[rgba(255,146,165,0.1)] border border-[rgba(255,146,165,0.3)] rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className={`font-semibold ${setsWon1 >= setsToWin ? 'text-positive' : 'text-foreground'}`}>
+                      {player1?.name || 'Spelare 1'}: {setsWon1} set
+                    </span>
+                    <span className="text-muted-foreground">-</span>
+                    <span className={`font-semibold ${setsWon2 >= setsToWin ? 'text-positive' : 'text-foreground'}`}>
+                      {player2?.name || 'Spelare 2'}: {setsWon2} set
+                    </span>
+                  </div>
+                  {matchComplete && (
+                    <p className="text-center text-positive mt-2 font-semibold">
+                      {setsWon1 >= setsToWin ? player1?.name : player2?.name} vinner matchen!
+                    </p>
+                  )}
                 </div>
+              )}
+
+              {/* Set Scores */}
+              <div className="space-y-4">
+                <Label className="text-muted-foreground">Setresultat</Label>
+                {setScores.map((set, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <span className="text-muted-foreground text-sm w-16">Set {index + 1}</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={set.score1}
+                      onChange={(e) => handleSetScoreChange(index, 'score1', e.target.value)}
+                      placeholder="0"
+                      className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)] w-20 text-center"
+                      disabled={isSubmitting}
+                    />
+                    <span className="text-muted-foreground">-</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={set.score2}
+                      onChange={(e) => handleSetScoreChange(index, 'score2', e.target.value)}
+                      placeholder="0"
+                      className="bg-input border-border text-foreground placeholder:text-[rgba(255,242,244,0.6)] w-20 text-center"
+                      disabled={isSubmitting}
+                    />
+                    {setScores.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeSet(index)}
+                        disabled={isSubmitting}
+                        className="text-negative hover:text-negative hover:bg-[rgba(255,71,103,0.1)]"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+
+                {canAddSet && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addSet}
+                    disabled={isSubmitting}
+                    className="border-border text-muted-foreground hover:bg-table-row-hover"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Lägg till set
+                  </Button>
+                )}
               </div>
 
               {error && (
@@ -195,7 +321,7 @@ function RegisterMatch() {
               <div className="flex gap-4">
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !player1Id || !player2Id || !score1 || !score2}
+                  disabled={isSubmitting || !player1Id || !player2Id || !matchComplete}
                   className="bg-primary hover:bg-[rgba(242,12,108,0.5)] flex-1"
                 >
                   {isSubmitting ? 'Registrerar...' : 'Registrera Match'}
@@ -218,11 +344,10 @@ function RegisterMatch() {
                 <div className="text-sm text-muted-foreground">
                   <strong className="text-[rgba(68,188,255,1)]">Pingisregler:</strong>
                   <ul className="mt-2 space-y-1 list-disc list-inside">
-                    <li>Välj din motståndare</li>
-                    <li>Bäst av 1 eller 3 set</li>
-                    <li>Vinnaren av setet måste ha minst 11 poäng</li>
-                    <li>Vinnaren av setet måste vinna med minst 2 poäng</li>
-                    <li>Matchen kan inte sluta oavgjort</li>
+                    <li>Välj matchformat: bäst av 1, 3 eller 5 set</li>
+                    <li>Vinnaren av varje set måste ha minst 11 poäng</li>
+                    <li>Vinnaren av varje set måste vinna med minst 2 poäng</li>
+                    <li>ELO räknas endast för hela matchens vinnare</li>
                     <li>Vinster mot en starkare spelare ger dig fler poäng</li>
                   </ul>
                 </div>
@@ -234,4 +359,3 @@ function RegisterMatch() {
     </div>
   )
 }
-

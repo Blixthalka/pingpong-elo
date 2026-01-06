@@ -46,7 +46,7 @@ export function validatePingPongScore(
 }
 
 /**
- * Determine the winner of a match
+ * Determine the winner of a set or match based on scores
  */
 export function getWinner(
   score1: number,
@@ -54,6 +54,93 @@ export function getWinner(
 ): 'player1' | 'player2' | null {
   if (score1 > score2) return 'player1'
   if (score2 > score1) return 'player2'
+  return null
+}
+
+export type SetScore = {
+  score1: number
+  score2: number
+}
+
+/**
+ * Validate a multi-set match
+ * @param matchFormat - Best of 1, 3, or 5 sets
+ * @param setScores - Array of set scores
+ */
+export function validateMatch(
+  matchFormat: number,
+  setScores: SetScore[],
+): { valid: boolean; error?: string; setsWon1?: number; setsWon2?: number } {
+  // Validate match format
+  if (![1, 3, 5].includes(matchFormat)) {
+    return { valid: false, error: 'Matchformat måste vara 1, 3 eller 5 set' }
+  }
+
+  const setsToWin = Math.ceil(matchFormat / 2)
+
+  if (setScores.length === 0) {
+    return { valid: false, error: 'Inga set har registrerats' }
+  }
+
+  // Validate each set
+  let setsWon1 = 0
+  let setsWon2 = 0
+
+  for (let i = 0; i < setScores.length; i++) {
+    const set = setScores[i]
+    const setValidation = validatePingPongScore(set.score1, set.score2)
+    if (!setValidation.valid) {
+      return { valid: false, error: `Set ${i + 1}: ${setValidation.error}` }
+    }
+
+    if (set.score1 > set.score2) {
+      setsWon1++
+    } else {
+      setsWon2++
+    }
+
+    // Check if match is already decided
+    if (setsWon1 === setsToWin || setsWon2 === setsToWin) {
+      // This should be the last set
+      if (i !== setScores.length - 1) {
+        return {
+          valid: false,
+          error: 'Matchen fortsatte efter att en spelare redan vunnit',
+        }
+      }
+    }
+  }
+
+  // Verify someone won the match
+  if (setsWon1 !== setsToWin && setsWon2 !== setsToWin) {
+    return {
+      valid: false,
+      error: `Ingen spelare har vunnit ${setsToWin} set än`,
+    }
+  }
+
+  return { valid: true, setsWon1, setsWon2 }
+}
+
+/**
+ * Get the winner of a multi-set match
+ */
+export function getMatchWinner(
+  setScores: SetScore[],
+): 'player1' | 'player2' | null {
+  let setsWon1 = 0
+  let setsWon2 = 0
+
+  for (const set of setScores) {
+    if (set.score1 > set.score2) {
+      setsWon1++
+    } else if (set.score2 > set.score1) {
+      setsWon2++
+    }
+  }
+
+  if (setsWon1 > setsWon2) return 'player1'
+  if (setsWon2 > setsWon1) return 'player2'
   return null
 }
 

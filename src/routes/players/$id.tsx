@@ -79,6 +79,11 @@ function PlayerDetail() {
                   const playerEloAfter = isPlayer1 ? match.player1_elo_after : match.player2_elo_after
                   const eloChange = playerEloAfter - playerEloBefore
                   const won = playerScore > opponentScore
+                  const setScores = match.set_scores
+                    ? (JSON.parse(match.set_scores) as { score1: number; score2: number }[])
+                    : null
+                  const formatLabel =
+                    match.match_format === 5 ? 'Bo5' : match.match_format === 3 ? 'Bo3' : 'Bo1'
 
                   return (
                     <div
@@ -96,7 +101,8 @@ function PlayerDetail() {
                             <div className="text-foreground font-semibold">
                               vs {opponentName}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <span className="bg-[rgba(255,146,165,0.2)] px-1.5 py-0.5 rounded text-xs">{formatLabel}</span>
                               {won ? 'Vinst' : 'Förlust'}
                             </div>
                           </div>
@@ -105,6 +111,17 @@ function PlayerDetail() {
                           <div className="text-2xl font-bold text-foreground">
                             {playerScore} - {opponentScore}
                           </div>
+                          {setScores && setScores.length > 0 && (
+                            <div className="text-xs text-muted-foreground">
+                              ({setScores
+                                .map((s) =>
+                                  isPlayer1
+                                    ? `${s.score1}-${s.score2}`
+                                    : `${s.score2}-${s.score1}`
+                                )
+                                .join(', ')})
+                            </div>
+                          )}
                           <div className={`text-sm font-medium ${eloChange > 0 ? 'text-positive' : 'text-negative'}`}>
                             {eloChange > 0 ? '+' : ''}{eloChange} ELO
                           </div>

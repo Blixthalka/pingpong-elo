@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db, type Player, type MatchWithNames } from '../lib/db'
 import { calculateElo } from '../lib/elo'
-import { validatePingPongScore, getWinner } from '../lib/rules'
+import { validateMatch, getMatchWinner, type SetScore } from '../lib/rules'
 
 /**
  * Get all players sorted by ELO (leaderboard)
@@ -44,19 +44,23 @@ export const addPlayer = createServerFn({ method: 'POST' })
  */
 export const registerMatch = createServerFn({ method: 'POST' })
   .inputValidator(
-    (data: { player1_id: number; player2_id: number; score1: number; score2: number }) =>
-      data,
+    (data: {
+      player1_id: number
+      player2_id: number
+      match_format: number
+      set_scores: SetScore[]
+    }) => data,
   )
   .handler(async ({ data }) => {
-    const { player1_id, player2_id, score1, score2 } = data
+    const { player1_id, player2_id, match_format, set_scores } = data
 
     // Validate players are different
     if (player1_id === player2_id) {
       throw new Error('Spelarna måste vara olika')
     }
 
-    // Validate scores
-    const validation = validatePingPongScore(score1, score2)
+    // Validate match and sets
+    const validation = validateMatch(match_format, set_scores)
     if (!validation.valid) {
       throw new Error(validation.error)
     }
@@ -69,13 +73,13 @@ export const registerMatch = createServerFn({ method: 'POST' })
       throw new Error('En eller båda spelarna hittades inte')
     }
 
-    // Determine winner
-    const winner = getWinner(score1, score2)
+    // Determine winner based on sets won
+    const winner = getMatchWinner(set_scores)
     if (!winner) {
       throw new Error('Kunde inte avgöra vinnare')
     }
 
-    // Calculate new ELO ratings
+    // Calculate new ELO ratings (based on match win, not individual sets)
     const { winner_new_elo, loser_new_elo } =
       winner === 'player1'
         ? calculateElo(player1.elo, player2.elo)
@@ -84,12 +88,14 @@ export const registerMatch = createServerFn({ method: 'POST' })
     const player1_new_elo = winner === 'player1' ? winner_new_elo : loser_new_elo
     const player2_new_elo = winner === 'player2' ? winner_new_elo : loser_new_elo
 
-    // Insert match record
+    // Insert match record with sets won as scores
     await db.addMatch({
       player1_id,
       player2_id,
-      score1,
-      score2,
+      score1: validation.setsWon1!,
+      score2: validation.setsWon2!,
+      match_format,
+      set_scores: JSON.stringify(set_scores),
       player1_elo_before: player1.elo,
       player2_elo_before: player2.elo,
       player1_elo_after: player1_new_elo,

@@ -38,12 +38,23 @@ async function initializeDatabase() {
         player2_id INTEGER NOT NULL REFERENCES players(id),
         score1 INTEGER NOT NULL,
         score2 INTEGER NOT NULL,
+        match_format INTEGER NOT NULL DEFAULT 1,
+        set_scores TEXT,
         player1_elo_before INTEGER NOT NULL,
         player2_elo_before INTEGER NOT NULL,
         player1_elo_after INTEGER NOT NULL,
         player2_elo_after INTEGER NOT NULL,
         timestamp BIGINT NOT NULL
       )
+    `
+
+    // Add new columns if they don't exist (migration for existing databases)
+    await sql`
+      DO $$ BEGIN
+        ALTER TABLE matches ADD COLUMN IF NOT EXISTS match_format INTEGER NOT NULL DEFAULT 1;
+        ALTER TABLE matches ADD COLUMN IF NOT EXISTS set_scores TEXT;
+      EXCEPTION WHEN others THEN NULL;
+      END $$;
     `
 
     // Create indexes
@@ -74,12 +85,19 @@ export type Player = {
   created_at: number
 }
 
+export type SetScore = {
+  score1: number
+  score2: number
+}
+
 export type Match = {
   id: number
   player1_id: number
   player2_id: number
   score1: number
   score2: number
+  match_format: number
+  set_scores: string | null
   player1_elo_before: number
   player2_elo_before: number
   player1_elo_after: number
@@ -191,15 +209,17 @@ export const db = {
 
   async addMatch(match: Omit<Match, 'id' | 'timestamp'>): Promise<Match> {
     const now = Date.now()
-    
+
     const matches = await sql<Match[]>`
-      INSERT INTO matches 
-      (player1_id, player2_id, score1, score2, player1_elo_before, player2_elo_before, player1_elo_after, player2_elo_after, timestamp)
+      INSERT INTO matches
+      (player1_id, player2_id, score1, score2, match_format, set_scores, player1_elo_before, player2_elo_before, player1_elo_after, player2_elo_after, timestamp)
       VALUES (
         ${match.player1_id},
         ${match.player2_id},
         ${match.score1},
         ${match.score2},
+        ${match.match_format},
+        ${match.set_scores},
         ${match.player1_elo_before},
         ${match.player2_elo_before},
         ${match.player1_elo_after},
@@ -208,7 +228,7 @@ export const db = {
       )
       RETURNING *
     `
-    
+
     return matches[0]
   },
 }

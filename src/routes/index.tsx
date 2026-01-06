@@ -122,6 +122,11 @@ function Dashboard() {
                   recentMatches.map((match) => {
                     const winner = match.score1 > match.score2 ? match.player1_name : match.player2_name
                     const isPlayer1Winner = match.score1 > match.score2
+                    const setScores = match.set_scores
+                      ? (JSON.parse(match.set_scores) as { score1: number; score2: number }[])
+                      : null
+                    const formatLabel =
+                      match.match_format === 5 ? 'Bo5' : match.match_format === 3 ? 'Bo3' : 'Bo1'
                     return (
                       <div
                         key={match.id}
@@ -138,7 +143,13 @@ function Dashboard() {
                             {match.player2_name}
                           </span>
                         </div>
+                        {setScores && setScores.length > 0 && (
+                          <div className="text-xs text-muted-foreground text-center mb-1">
+                            ({setScores.map((s) => `${s.score1}-${s.score2}`).join(', ')})
+                          </div>
+                        )}
                         <div className="text-xs text-muted-foreground text-center">
+                          <span className="bg-[rgba(255,146,165,0.2)] px-2 py-0.5 rounded mr-2">{formatLabel}</span>
                           Vinnare: {winner}
                         </div>
                         <div className="flex justify-between text-xs text-muted mt-2">
