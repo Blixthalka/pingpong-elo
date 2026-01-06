@@ -93,7 +93,11 @@ function Dashboard() {
                           {index === 2 && '🥉'}
                           {index > 2 && `#${index + 1}`}
                         </TableCell>
-                        <TableCell className="text-foreground font-semibold">{player.name}</TableCell>
+                        <TableCell className="font-semibold">
+                          <Link to={`/players/${player.id}`} className="text-link hover:text-[rgba(255,146,165,0.8)]">
+                            {player.name}
+                          </Link>
+                        </TableCell>
                         <TableCell className="text-right text-link font-bold">{player.elo}</TableCell>
                         <TableCell className="text-right text-positive">{player.wins}</TableCell>
                         <TableCell className="text-right text-negative">{player.losses}</TableCell>

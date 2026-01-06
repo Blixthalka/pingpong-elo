@@ -127,3 +127,26 @@ export const getRecentMatches = createServerFn({
   return matches
 })
 
+/**
+ * Get a player by ID
+ */
+export const getPlayerById = createServerFn({ method: 'GET' })
+  .inputValidator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    const player = await db.getPlayerById(data.id)
+    if (!player) {
+      throw new Error('Spelaren hittades inte')
+    }
+    return player
+  })
+
+/**
+ * Get all matches for a specific player
+ */
+export const getPlayerMatches = createServerFn({ method: 'GET' })
+  .inputValidator((data: { playerId: number }) => data)
+  .handler(async ({ data }) => {
+    const matches = await db.getPlayerMatches(data.playerId)
+    return matches
+  })
+

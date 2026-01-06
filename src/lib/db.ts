@@ -161,7 +161,7 @@ export const db = {
 
   async getMatchesWithNames(): Promise<MatchWithNames[]> {
     const matches = await sql<MatchWithNames[]>`
-      SELECT 
+      SELECT
         m.*,
         p1.name as player1_name,
         p2.name as player2_name
@@ -170,6 +170,21 @@ export const db = {
       JOIN players p2 ON m.player2_id = p2.id
       ORDER BY m.timestamp DESC
       LIMIT 10
+    `
+    return matches
+  },
+
+  async getPlayerMatches(playerId: number): Promise<MatchWithNames[]> {
+    const matches = await sql<MatchWithNames[]>`
+      SELECT
+        m.*,
+        p1.name as player1_name,
+        p2.name as player2_name
+      FROM matches m
+      JOIN players p1 ON m.player1_id = p1.id
+      JOIN players p2 ON m.player2_id = p2.id
+      WHERE m.player1_id = ${playerId} OR m.player2_id = ${playerId}
+      ORDER BY m.timestamp DESC
     `
     return matches
   },
