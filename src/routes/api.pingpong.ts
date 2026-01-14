@@ -1,7 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
-import { db, type Player, type MatchWithNames } from '../lib/db'
+import { db } from '../lib/db'
 import { calculateElo } from '../lib/elo'
-import { validateMatch, getMatchWinner, type SetScore } from '../lib/rules'
+import {
+  validateSetCounts,
+  validatePingPongScore,
+  getWinner,
+  type SetScore,
+} from '../lib/rules'
 
 /**
  * Get all players sorted by ELO (leaderboard)
@@ -41,6 +46,8 @@ export const addPlayer = createServerFn({ method: 'POST' })
 
 /**
  * Register a match and update ELO ratings
+ * For Bo1: provide set_score with point values (e.g., 11-9)
+ * For Bo3/Bo5: provide sets_won1/sets_won2 with set counts (e.g., 2-1)
  */
 export const registerMatch = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -48,21 +55,55 @@ export const registerMatch = createServerFn({ method: 'POST' })
       player1_id: number
       player2_id: number
       match_format: number
-      set_scores: SetScore[]
+      // For Bo1 matches - point score
+      set_score?: SetScore
+      // For Bo3/Bo5 matches - set counts
+      sets_won1?: number
+      sets_won2?: number
     }) => data,
   )
   .handler(async ({ data }) => {
-    const { player1_id, player2_id, match_format, set_scores } = data
+    const { player1_id, player2_id, match_format, set_score, sets_won1, sets_won2 } = data
 
     // Validate players are different
     if (player1_id === player2_id) {
       throw new Error('Spelarna måste vara olika')
     }
 
-    // Validate match and sets
-    const validation = validateMatch(match_format, set_scores)
-    if (!validation.valid) {
-      throw new Error(validation.error)
+    let finalSetsWon1: number
+    let finalSetsWon2: number
+    let setScoresJson: string | null = null
+    let winner: 'player1' | 'player2' | null
+
+    if (match_format === 1) {
+      // Bo1: validate point score
+      if (!set_score) {
+        throw new Error('Setresultat krävs för bäst av 1')
+      }
+      const validation = validatePingPongScore(set_score.score1, set_score.score2)
+      if (!validation.valid) {
+        throw new Error(validation.error)
+      }
+      winner = getWinner(set_score.score1, set_score.score2)
+      finalSetsWon1 = winner === 'player1' ? 1 : 0
+      finalSetsWon2 = winner === 'player2' ? 1 : 0
+      setScoresJson = JSON.stringify([set_score])
+    } else {
+      // Bo3/Bo5: validate set counts
+      if (sets_won1 === undefined || sets_won2 === undefined) {
+        throw new Error('Setresultat krävs')
+      }
+      const validation = validateSetCounts(match_format, sets_won1, sets_won2)
+      if (!validation.valid) {
+        throw new Error(validation.error)
+      }
+      winner = getWinner(sets_won1, sets_won2)
+      finalSetsWon1 = sets_won1
+      finalSetsWon2 = sets_won2
+    }
+
+    if (!winner) {
+      throw new Error('Kunde inte avgöra vinnare')
     }
 
     // Get current player data
@@ -73,47 +114,40 @@ export const registerMatch = createServerFn({ method: 'POST' })
       throw new Error('En eller båda spelarna hittades inte')
     }
 
-    // Determine winner based on sets won
-    const winner = getMatchWinner(set_scores)
-    if (!winner) {
-      throw new Error('Kunde inte avgöra vinnare')
-    }
-
     // Calculate new ELO ratings (based on match win, not individual sets)
-    const { winner_new_elo, loser_new_elo } =
-      winner === 'player1'
-        ? calculateElo(player1.elo, player2.elo)
-        : calculateElo(player2.elo, player1.elo)
+    const player1Won = winner === 'player1'
+    const { winner_new_elo, loser_new_elo } = player1Won
+      ? calculateElo(player1.elo, player2.elo)
+      : calculateElo(player2.elo, player1.elo)
 
-    const player1_new_elo = winner === 'player1' ? winner_new_elo : loser_new_elo
-    const player2_new_elo = winner === 'player2' ? winner_new_elo : loser_new_elo
+    const player1_new_elo = player1Won ? winner_new_elo : loser_new_elo
+    const player2_new_elo = player1Won ? loser_new_elo : winner_new_elo
 
-    // Insert match record with sets won as scores
+    // Insert match record
     await db.addMatch({
       player1_id,
       player2_id,
-      score1: validation.setsWon1!,
-      score2: validation.setsWon2!,
+      score1: finalSetsWon1,
+      score2: finalSetsWon2,
       match_format,
-      set_scores: JSON.stringify(set_scores),
+      set_scores: setScoresJson,
       player1_elo_before: player1.elo,
       player2_elo_before: player2.elo,
       player1_elo_after: player1_new_elo,
       player2_elo_after: player2_new_elo,
     })
 
-    // Update player 1
+    // Update player stats
     await db.updatePlayer(player1_id, {
       elo: player1_new_elo,
-      wins: player1.wins + (winner === 'player1' ? 1 : 0),
-      losses: player1.losses + (winner === 'player1' ? 0 : 1),
+      wins: player1.wins + (player1Won ? 1 : 0),
+      losses: player1.losses + (player1Won ? 0 : 1),
     })
 
-    // Update player 2
     await db.updatePlayer(player2_id, {
       elo: player2_new_elo,
-      wins: player2.wins + (winner === 'player2' ? 1 : 0),
-      losses: player2.losses + (winner === 'player2' ? 0 : 1),
+      wins: player2.wins + (player1Won ? 0 : 1),
+      losses: player2.losses + (player1Won ? 1 : 0),
     })
 
     return {
@@ -128,10 +162,7 @@ export const registerMatch = createServerFn({ method: 'POST' })
  */
 export const getRecentMatches = createServerFn({
   method: 'GET',
-}).handler(async () => {
-  const matches = await db.getMatchesWithNames()
-  return matches
-})
+}).handler(() => db.getMatchesWithNames())
 
 /**
  * Get a player by ID
@@ -151,8 +182,4 @@ export const getPlayerById = createServerFn({ method: 'GET' })
  */
 export const getPlayerMatches = createServerFn({ method: 'GET' })
   .inputValidator((data: { playerId: number }) => data)
-  .handler(async ({ data }) => {
-    const matches = await db.getPlayerMatches(data.playerId)
-    return matches
-  })
-
+  .handler(({ data }) => db.getPlayerMatches(data.playerId))

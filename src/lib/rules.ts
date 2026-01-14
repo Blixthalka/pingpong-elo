@@ -144,3 +144,56 @@ export function getMatchWinner(
   return null
 }
 
+/**
+ * Validate set counts for a match (simplified scoring without detailed set scores)
+ * @param matchFormat - Best of 1, 3, or 5 sets
+ * @param setsWon1 - Sets won by player 1
+ * @param setsWon2 - Sets won by player 2
+ */
+export function validateSetCounts(
+  matchFormat: number,
+  setsWon1: number,
+  setsWon2: number,
+): { valid: boolean; error?: string } {
+  // Validate match format
+  if (![1, 3, 5].includes(matchFormat)) {
+    return { valid: false, error: 'Matchformat måste vara 1, 3 eller 5 set' }
+  }
+
+  // Validate set counts are integers
+  if (!Number.isInteger(setsWon1) || !Number.isInteger(setsWon2)) {
+    return { valid: false, error: 'Setresultat måste vara heltal' }
+  }
+
+  // Validate non-negative
+  if (setsWon1 < 0 || setsWon2 < 0) {
+    return { valid: false, error: 'Setresultat kan inte vara negativa' }
+  }
+
+  const setsToWin = Math.ceil(matchFormat / 2)
+
+  // Validate one player has won
+  if (setsWon1 !== setsToWin && setsWon2 !== setsToWin) {
+    return { valid: false, error: `En spelare måste ha vunnit ${setsToWin} set` }
+  }
+
+  // Validate both players haven't won
+  if (setsWon1 === setsToWin && setsWon2 === setsToWin) {
+    return { valid: false, error: 'Båda spelarna kan inte vinna matchen' }
+  }
+
+  // Validate loser hasn't won too many sets
+  const loserSets = Math.min(setsWon1, setsWon2)
+  if (loserSets >= setsToWin) {
+    return { valid: false, error: 'Ogiltigt setresultat' }
+  }
+
+  // Validate total sets doesn't exceed maximum
+  const totalSets = setsWon1 + setsWon2
+  if (totalSets > matchFormat) {
+    return { valid: false, error: 'För många set för matchformatet' }
+  }
+
+  return { valid: true }
+}
+
