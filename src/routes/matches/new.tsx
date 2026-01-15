@@ -30,11 +30,11 @@ function RegisterMatch() {
   const [player2Id, setPlayer2Id] = useState<string>('')
   const [matchFormat, setMatchFormat] = useState<string>('1')
   // For Bo1 - point scores
-  const [score1, setScore1] = useState<string>('')
-  const [score2, setScore2] = useState<string>('')
+  const [score1, setScore1] = useState<string>('0')
+  const [score2, setScore2] = useState<string>('0')
   // For Bo3/Bo5 - set counts
-  const [setsWon1, setSetsWon1] = useState<string>('')
-  const [setsWon2, setSetsWon2] = useState<string>('')
+  const [setsWon1, setSetsWon1] = useState<string>('0')
+  const [setsWon2, setSetsWon2] = useState<string>('0')
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -63,10 +63,10 @@ function RegisterMatch() {
   const handleMatchFormatChange = (value: string) => {
     setMatchFormat(value)
     // Reset scores when format changes
-    setScore1('')
-    setScore2('')
-    setSetsWon1('')
-    setSetsWon2('')
+    setScore1('0')
+    setScore2('0')
+    setSetsWon1('0')
+    setSetsWon2('0')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
