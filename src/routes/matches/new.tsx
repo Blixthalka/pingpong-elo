@@ -306,11 +306,15 @@ function RegisterMatch() {
                     )}
                   </div>
                 </div>
-                {matchComplete && (
+                {matchComplete ? (
                   <p className="text-center text-positive font-semibold text-sm">
                     {getWinnerName()} vinner matchen!
                   </p>
-                )}
+                ) : isBo1 && (parsedScore1 > 0 || parsedScore2 > 0) ? (
+                  <p className="text-center text-muted-foreground text-sm">
+                    Vinnaren måste ha minst 11 poäng och vinna med 2 poäng
+                  </p>
+                ) : null}
               </div>
 
               {error && (
