@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { ArrowLeft, User, Trophy, TrendingUp, TrendingDown } from 'lucide-react'
+import { ArrowLeft, User, Trophy, TrendingUp, TrendingDown, Skull } from 'lucide-react'
 import { getPlayerById, getPlayerMatches } from '../api.pingpong'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+import { calculateNemesis } from '../../lib/stats'
 
 export const Route = createFileRoute('/players/$id')({
   component: PlayerDetail,
@@ -11,12 +12,13 @@ export const Route = createFileRoute('/players/$id')({
       getPlayerById({ data: { id: playerId } }),
       getPlayerMatches({ data: { playerId } }),
     ])
-    return { player, matches }
+    const nemesis = calculateNemesis(playerId, matches)
+    return { player, matches, nemesis }
   },
 })
 
 function PlayerDetail() {
-  const { player, matches } = Route.useLoaderData()
+  const { player, matches, nemesis } = Route.useLoaderData()
 
   const totalGames = player.wins + player.losses
   const winRate = totalGames > 0 ? ((player.wins / totalGames) * 100).toFixed(1) : '0.0'
@@ -57,6 +59,58 @@ function PlayerDetail() {
             </div>
           </CardContent>
         </Card>
+
+        {nemesis && (
+          <Card className="mb-5 relative overflow-hidden">
+            {/* Animated glow border */}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-red-500/20 via-orange-500/10 to-red-500/20 animate-nemesis-pulse" />
+            <div className="absolute inset-[1px] rounded-[11px] bg-card" />
+
+            <CardHeader className="relative">
+              <CardTitle className="text-lg text-foreground flex items-center gap-2 font-bold tracking-tight">
+                <div className="relative">
+                  <Skull className="w-5 h-5 text-red-500" />
+                  <div className="absolute inset-0 blur-sm bg-red-500/50 animate-pulse" />
+                </div>
+                <span className="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
+                  Nemesis
+                </span>
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent className="relative">
+              <div className="bg-gradient-to-br from-red-950/30 to-orange-950/20 rounded-lg p-4 border border-red-500/20">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <Link
+                      to={`/players/${nemesis.opponentId}`}
+                      className="text-lg font-bold text-foreground hover:text-red-400 transition-colors truncate block"
+                    >
+                      {nemesis.opponentName}
+                    </Link>
+                    <p className="text-xs text-red-400/80 mt-1 font-medium tracking-wide">
+                      Din svåraste motståndare
+                    </p>
+                  </div>
+
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-3xl font-black text-red-400 tabular-nums tracking-tighter">
+                      {nemesis.winRate.toFixed(0)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground tabular-nums mt-1">
+                      <span className="text-positive">{nemesis.wins}V</span>
+                      <span className="mx-1">–</span>
+                      <span className="text-negative">{nemesis.losses}F</span>
+                      <span className="text-muted-foreground/60 ml-1">
+                        ({nemesis.totalMatches})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>
