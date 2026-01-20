@@ -326,7 +326,7 @@ function RegisterMatch() {
               <div className="flex gap-3 pt-2">
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !player1Id || !player2Id || !matchComplete}
+                  disabled={isSubmitting || !player1Id || !player2Id || player1Id === player2Id || !matchComplete}
                   className="flex-1"
                 >
                   {isSubmitting ? 'Registrerar...' : 'Registrera Match'}
